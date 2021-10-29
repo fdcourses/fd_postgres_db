@@ -1,4 +1,5 @@
 const {Client} = require('pg');
+const {loadUsers} = require('./api');
 
 const config = {
   user: 'postgres',
@@ -37,18 +38,10 @@ const users =  [
 
 const client = new Client(config);
 
-const testUser = {
-  firstName: 'Test',
-  lastName : "Testovich",
-  email: 'test@test.test',
-  birthday: '1984/7/10',
-  height: 1.68,
-  isMale: true
-}
-
 async function start() {
   await client.connect();
 
+  const users = await loadUsers();
   const result = await client.query(`
     INSERT INTO users (
       first_name, 
@@ -68,8 +61,8 @@ async function start() {
 function mapUsers(usersArr) {
   return usersArr
     .map(
-      (user) =>
-        `('${user.firstName}', '${user.lastName}', '${user.email}', '${user.birthday}', ${user.height}, ${user.isMale})`
+      ({gender, name: {first, last}, email, dob: {date} }) =>
+        `('${first}', '${last}', '${email}', '${date}', ${Math.random() + 1}, ${gender === "male"})`
     )
     .join(',');
 }
