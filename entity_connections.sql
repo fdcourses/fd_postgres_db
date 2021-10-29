@@ -16,6 +16,16 @@ CREATE TABLE "users"(
   is_male boolean,
   CONSTRAINT "CHECK_EMAIL_NOT_EMPTY" CHECK (email != '')
 );
+
+ALTER TABLE users
+DROP CONSTRAINT users_birthday_check;
+
+ALTER TABLE users
+ADD COLUMN height numeric (3, 2) CHECK (
+    height > 0.2
+    AND height < 3
+  );
+  
 /**/
 CREATE TABLE products (
   id bigserial PRIMARY KEY,
