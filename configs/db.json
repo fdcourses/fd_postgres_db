@@ -1,0 +1,7 @@
+{
+  "user": "postgres",
+  "password": "postgres",
+  "host": "localhost",
+  "database": "fd_db_dont_delete",
+  "port": 5432
+}

@@ -1,40 +1,6 @@
 const {Client} = require('pg');
 const {loadUsers} = require('./api');
-
-const config = {
-  user: 'postgres',
-  password: 'postgres',
-  host: 'localhost',
-  database: 'fd_db_dont_delete',
-  port: 5432
-}
-
-const users =  [
-  {
-    firstName: 'Test',
-    lastName: 'Testovich',
-    email: 'test1@test.test',
-    birthday: '2007/7/10',
-    height: 1.90,
-    isMale: true,
-  },
-  {
-    firstName: 'fdgfdghg',
-    lastName: 'dsfdgfdgfdgfds',
-    email: 'test2@test.test',
-    birthday: '1991/3/12',
-    height: 1.25,
-    isMale: false,
-  },
-  {
-    firstName: 'lf;ndsfougasb',
-    lastName: 'Testovdsfdsfich',
-    email: 'test3@test.test',
-    birthday: '1989/7/10',
-    height: 1.73,
-    isMale: true,
-  },
-];
+const config = require('./configs/db.json');
 
 const client = new Client(config);
 
