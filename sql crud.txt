@@ -1,0 +1,5 @@
+CRUD      SQL
+Create    INSERT - DML 
+Read      SELECT - DQL
+Update    UPDATE - DML
+Delete    DELETE - DML
