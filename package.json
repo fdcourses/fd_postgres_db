@@ -19,6 +19,8 @@
   "homepage": "https://github.com/fdcourses/fd_postgres_db#readme",
   "dependencies": {
     "axios": "^0.24.0",
-    "pg": "^8.7.1"
+    "lodash": "^4.17.21",
+    "pg": "^8.7.1",
+    "query-string": "^7.0.1"
   }
 }
