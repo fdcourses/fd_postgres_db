@@ -1,51 +1,61 @@
-const { Client } = require('pg');
+const path = require('path');
+const fs = require('fs').promises;
+const _ = require('lodash');
+const { User, client, Phone } = require('./models');
 const { loadUsers } = require('./api');
-const config = require('./configs/db.json');
+const { generatePhones } = require('./utils');
 
-const client = new Client(config);
+start();
 
-async function start() {
+async function start () {
   await client.connect();
 
-  await client.query(`CREATE TABLE IF NOT EXISTS "users"(
-    id serial PRIMARY KEY,
-    first_name varchar(64) NOT NULL CHECK(first_name != ''),
-    last_name varchar(64) NOT NULL CHECK(last_name != ''),
-    email varchar(256) NOT NULL UNIQUE,
-    birthday date NOT NULL,
-    height numeric (3, 2) CHECK (
-      height > 0.2
-      AND height < 3
-    ),
-    is_male boolean,
-    CONSTRAINT "CHECK_EMAIL_NOT_EMPTY" CHECK (email != '')
-  );`);
+  const resetDbQueryString = await fs.readFile(
+    path.join(__dirname, '/sql/reset-db-query.sql'),
+    'utf8'
+  );
 
-  const users = await loadUsers();
-  const result = await client.query(`
-    INSERT INTO users (
-      first_name, 
-      last_name, 
-      email, 
-      birthday,
-      height, 
-      is_male)
-    VALUES 
-    ${mapUsers(users)};
+  await client.query(resetDbQueryString);
+
+  /* СОЗДАЕМ ПОЛЬЗОВАТЕЛЕЙ */
+  const users = await User.bulkCreate(await loadUsers());
+  /* СОЗДАЕМА ТЕЛЕФОНЫ / ТОВАРЫ */
+  const phones = await Phone.bulkCreate(generatePhones());
+
+ 
+  /* СОЗДАЕМ ЗАКАЗ ДЛЯ КАЖДОГО ПОЛЬЗОВАТЕЛЯ */
+  const ordersValuesString = users
+    .map(u =>
+      new Array(_.random(1, 5, false))
+        .fill(null)
+        .map(() => `(${u.id})`)
+        .join(',')
+    )
+    .join(',');
+
+  const { rows: orders } = await client.query(`
+    INSERT INTO orders ("userId")
+    VALUES ${ordersValuesString}
+    RETURNING id;
   `);
+
+  /* НАПОЛНЯЕМ ЗАКАЗ ТЕЛЕФОНАМИ */
+  const phonesToOrdersValuesString = orders
+    .map(o => {
+      const arr = new Array(_.random(1, phones.length)).fill(null).map(
+        () => phones[_.random(1, phones.length - 1)]
+      );
+
+      return [...new Set(arr)]
+        .map(p => `(${o.id}, ${p.id}, ${_.random(1, 4)})`)
+        .join(',');
+    })
+    .join(',');
+
+  await client.query(`
+  INSERT INTO phones_to_orders ("orderId", "phoneId", "quantity")
+  VALUES ${phonesToOrdersValuesString};
+`);
 
   await client.end();
 }
-
-function mapUsers(usersArr) {
-  return usersArr
-    .map(
-      ({ gender, name: { first, last }, email, dob: { date } }) =>
-        `('${first}', '${last}', '${email}', '${date}', ${Math.random() + 1}, ${
-          gender === 'male'
-        })`
-    )
-    .join(',');
-}
-
-start();
