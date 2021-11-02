@@ -45,6 +45,34 @@ FROM (
   GROUP BY brand
 ) AS result
 WHERE "amount" > 8000;
+
+--взять юзеров и отсортировать по их возрасту
+-- 1 найти возраст каждого юзера
+SELECT extract(year from age(birthday)) as age,
+*
+FROM users
+ORDER BY age ASC;
+
+-- формируем подзапрос
+SELECT users_with_age.*
+FROM (
+  SELECT extract(year from age(birthday)) as age,
+  *
+  FROM users
+) AS "users_with_age"
+ORDER BY users_with_age.age;
+
+-- BONUS счыитаем скоко юзеров определенного возраста есть
+SELECT age, count(age) as "количество"
+FROM (
+  SELECT extract(year from age(birthday)) as age,
+  *
+  FROM users
+) AS "users_with_age"
+GROUP BY age
+HAVING age BETWEEN 25 AND 42
+ORDER BY users_with_age.age;
+
 --
 /*
 
