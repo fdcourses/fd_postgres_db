@@ -118,3 +118,10 @@ FULL JOIN phones_to_orders ON phones.id = phones_to_orders."phoneId"
 количестов заказов для каждого пользователя
 
 */
+
+--стоимость каждого совершенного заказа
+SELECT sum( phones.price * phones_to_orders.quantity) as "стоимость",
+phones_to_orders."orderId" as "order id"
+FROM phones
+JOIN phones_to_orders ON phones_to_orders."phoneId" = phones.id
+GROUP BY phones_to_orders."orderId";
