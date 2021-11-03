@@ -47,3 +47,4 @@ GROUP BY "firstName", "lastName";
 SELECT count (*)
 FROM users
 WHERE height > 1.5;
+
