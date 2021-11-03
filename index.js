@@ -43,7 +43,7 @@ async function start () {
   const phonesToOrdersValuesString = orders
     .map(o => {
       const arr = new Array(_.random(1, phones.length)).fill(null).map(
-        () => phones[_.random(1, phones.length - 1)]
+        () => phones[_.random(0, phones.length - 1)]
       );
 
       return [...new Set(arr)]
