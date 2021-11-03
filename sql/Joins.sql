@@ -153,6 +153,12 @@ FROM users
 JOIN orders USING "userId";
 
 -- найти самый популярный телефон
+SELECT sum(phones_to_orders.quantity) as "покупок",brand, model
+FROM phones
+JOIN phones_to_orders ON phones_to_orders."phoneId" = phones.id
+GROUP BY phones.id
+ORDER BY "покупок" DESC
+LIMIT 1;
 -- найти самого растратного пользователя
 -- извлечь пользователя и количество моделей телефонов которые он покупал
 -- ** все заказы со стоимостью чека выше средней стоимости заказа
