@@ -29,7 +29,11 @@ VALUES
 ('ABC', 'Test6'),
 ('CCC', 'Test7');
 
-SELECT * FROM a,b;
+-- SELECT *  FROM a,b WHERE a.x = b.x;
+-- SELECT *  FROM users, orders WHERE users.id = orders."userId"; 
+SELECT * 
+FROM users
+  JOIN orders ON users.id = orders."userId";
 
 -- находим все уникальные значения
 SELECT x FROM a
@@ -125,3 +129,30 @@ phones_to_orders."orderId" as "order id"
 FROM phones
 JOIN phones_to_orders ON phones_to_orders."phoneId" = phones.id
 GROUP BY phones_to_orders."orderId";
+--просмотрите все телефоны конкретного заказа
+SELECT phones.brand, phones.model
+FROM phones_to_orders
+JOIN phones ON phones.id = phones_to_orders."phoneId"
+WHERE phones_to_orders."orderId" = 1;
+-- количестов телефонов которое было куплено в определенном заказе
+SELECT sum(phones_to_orders.quantity)
+FROM phones_to_orders
+JOIN phones ON phones.id = phones_to_orders."phoneId"
+WHERE phones_to_orders."orderId" = 5;
+--количестов заказов для каждого пользователя
+SELECT count(*) AS "количество заказов"
+FROM orders
+JOIN users ON users.id = orders."userId"
+GROUP BY users.id;
+
+SELECT * FROM orders WHERE "userId" = 652;
+
+
+SELECT * 
+FROM users
+JOIN orders USING "userId";
+
+-- найти самый популярный телефон
+-- найти самого растратного пользователя
+-- извлечь пользователя и количество моделей телефонов которые он покупал
+-- ** все заказы со стоимостью чека выше средней стоимости заказа
