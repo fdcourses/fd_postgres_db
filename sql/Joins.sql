@@ -160,5 +160,79 @@ GROUP BY phones.id
 ORDER BY "покупок" DESC
 LIMIT 1;
 -- найти самого растратного пользователя
+SELECT sum(phones.price * phones_to_orders.quantity) as full_price,
+concat(users."firstName" , ' ' , users."lastName") as full_name,
+users.id
+FROM users
+  JOIN orders ON orders."userId" = users.id
+  JOIN phones_to_orders ON phones_to_orders."orderId" = orders.id
+  JOIN phones ON phones.id = phones_to_orders."phoneId"
+GROUP BY users.id
+ORDER BY full_price DESC
+LIMIT 1;
 -- извлечь пользователя и количество моделей телефонов которые он покупал
+SELECT users.id, phones_to_orders."phoneId"
+FROM users
+  JOIN orders ON orders."userId" = users.id
+  JOIN phones_to_orders ON phones_to_orders."orderId" = orders.id
+GROUP BY users.id, phones_to_orders."phoneId";
+--
+SELECT count(users_with_phones."phoneId") as "количество моделей",
+users_with_phones.id
+FROM (
+  SELECT users.id, phones_to_orders."phoneId"
+    FROM users
+    JOIN orders ON orders."userId" = users.id
+    JOIN phones_to_orders ON phones_to_orders."orderId" = orders.id
+  GROUP BY users.id, phones_to_orders."phoneId"
+  ) as "users_with_phones"
+GROUP BY users_with_phones.id;
+
 -- ** все заказы со стоимостью чека выше средней стоимости заказа
+-- общая стоимость каждого заказа
+SELECT sum(phones.price * phones_to_orders.quantity) as full_price
+FROM orders
+  JOIN phones_to_orders ON phones_to_orders."orderId" = orders.id
+  JOIN phones ON phones.id = phones_to_orders."phoneId"
+GROUP BY orders.id;
+--  средняя стоимость заказа
+SELECT avg(orders_price.full_price)
+FROM (
+  SELECT sum(phones.price * phones_to_orders.quantity) as full_price
+  FROM orders
+    JOIN phones_to_orders ON phones_to_orders."orderId" = orders.id
+    JOIN phones ON phones.id = phones_to_orders."phoneId"
+  GROUP BY orders.id
+) as orders_price;
+-- итоговое
+SELECT sum(phones.price * phones_to_orders.quantity) as full_price,
+orders.id
+FROM orders
+  JOIN phones_to_orders ON phones_to_orders."orderId" = orders.id
+  JOIN phones ON phones.id = phones_to_orders."phoneId"
+GROUP BY orders.id
+HAVING sum(phones.price * phones_to_orders.quantity) > (
+  SELECT avg(orders_price.full_price)
+  FROM (
+    SELECT sum(phones.price * phones_to_orders.quantity) as full_price
+    FROM orders
+      JOIN phones_to_orders ON phones_to_orders."orderId" = orders.id
+      JOIN phones ON phones.id = phones_to_orders."phoneId"
+    GROUP BY orders.id
+  ) as orders_price
+);
+--
+WITH orders_with_price AS (
+  SELECT sum(phones.price * phones_to_orders.quantity) as full_price,
+  orders.id
+  FROM orders
+    JOIN phones_to_orders ON phones_to_orders."orderId" = orders.id
+    JOIN phones ON phones.id = phones_to_orders."phoneId"
+  GROUP BY orders.id
+), avg_order_price AS (
+  SELECT avg(orders_with_price.full_price)
+  FROM orders_with_price
+)
+SELECT *
+FROM orders_with_price 
+WHERE orders_with_price.full_price > (SELECT * FROM avg_order_price);
