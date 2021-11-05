@@ -95,3 +95,28 @@ VALUES (
     
   * 
 */
+
+CREATE SCHEMA task;
+
+CREATE TABLE task.users(
+  id serial PRIMARY KEY,
+  "login" varchar(32),
+  "password" varchar(32),
+  email varchar(128)
+);
+
+CREATE TABLE task.employees (
+  id serial PRIMARY KEY,
+  department text,
+  postition text,
+  "name" text,
+  hire_date date DEFAULT current_date
+);
+
+/*
+  добавить ограничение уникальности для емейла
+  удлить пароль
+  создать столбец password_hash и прокинуть ему ограничения,
+  связать users и employees 
+
+*/
