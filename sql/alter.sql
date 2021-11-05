@@ -116,7 +116,37 @@ CREATE TABLE task.employees (
 /*
   добавить ограничение уникальности для емейла
   удлить пароль
-  создать столбец password_hash и прокинуть ему ограничения,
+  создать столбец password_hash для юзера и прокинуть ему ограничения,
   связать users и employees 
 
 */
+
+INSERT INTO task.users ("login", "password_hash", "email") values 
+('testa343', '12345asfaogn;dfdsasgdfasgsd', 'tes123t@mail.com'),
+('user2', 'asfgbflu342389sFdfgfdhdsfSFg23423d', 'user@m32423ail.mail'),
+('bigBoss', 'admin12345sagdhgdfgsdfd213', 'bigBoss234235@company.net');
+
+ALTER TABLE task.users
+ADD UNIQUE(email);
+
+ALTER TABLE task.users
+DROP COLUMN password;
+
+ALTER TABLE task.users
+ADD COLUMN password_hash varchar(64) CHECK(password_hash != '');
+
+ALTER TABLE task.employees
+ADD COLUMN user_id int NOT NULL REFERENCES task.users;
+
+INSERT INTO task.employees (user_id ,department, postition) VALUES
+(4,'IT', 'coder'),
+(6,'Sales', 'Sales manages');
+
+
+ALTER TABLE task.employees
+ADD COLUMN salary numeric(10,2) NOT NULL DEFAULT 1000 CHECK (salary > 0);
+
+-- Получить ВСЕХ ЮЗЕРОВ с их зарплатой
+SELECT u.* , coalesce(emp.salary , 0) as salary
+FROM task.users  as u
+  LEFT JOIN task.employees as emp ON u.id = emp.user_id;
