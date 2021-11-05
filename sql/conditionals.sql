@@ -54,3 +54,31 @@ SELECT CASE
   ELSE 'not Apple'
 END as производитель, *
 FROM phones;
+
+/*
+  COALESCE
+*/
+
+SELECT coalesce(NULL, NULL, 15);
+
+
+SELECT coalesce(NULL, 'sdgdfgsdffsa');
+
+INSERT INTO a VALUES('tes');
+
+SELECT x, coalesce(v, -5000) as v FROM a;
+
+/*
+  NULLIF
+*/
+
+SELECT nullif(10,10);
+
+SELECT nullif(NULL,10);
+
+/* 
+CREATEGREATES LEAST
+ */
+
+ SELECT greatest(1,2,4,5,999,7,2,38);
+ 
