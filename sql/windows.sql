@@ -59,17 +59,16 @@ SELECT emp.*, dep.name, avg_salary_table.avg_salary
 FROM wf.departments AS dep
   JOIN wf.employees AS emp ON emp.department_id = dep.id
   JOIN (
-    SELECT avg(emp.salary) as avg_salary, dep.name, dep.id
+    SELECT avg(emp.salary) as avg_salary
     FROM wf.departments AS dep
       JOIN wf.employees AS emp ON emp.department_id = dep.id
-    GROUP BY dep.id
   ) as avg_salary_table ON dep.id = avg_salary_table.id;
 
 -- Window Functions
 
 SELECT emp.*,
 dep.name,
-avg(emp.salary) OVER (PARTITION BY dep.id) as avg_salary,
+avg(emp.salary) OVER (PARTITION BY dep.id ORDER BY emp.salary DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) as avg_salary_for_department,
 avg(emp.salary) OVER () as avg_salary_for_company
 FROM wf.employees emp
   JOIN wf.departments dep ON dep.id = emp.department_id;
